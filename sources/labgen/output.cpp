@@ -11,21 +11,21 @@ namespace
 		switch (neighbors)
 		{
 		case 0: return '+';
-		case 1: return 196;
-		case 2: return 179;
-		case 3: return 217;
-		case 4: return 196;
-		case 5: return 196;
-		case 6: return 192;
-		case 7: return 193;
-		case 8: return 179;
-		case 9: return 191;
-		case 10: return 179;
-		case 11: return 180;
-		case 12: return 218;
-		case 13: return 194;
-		case 14: return 195;
-		case 15: return 197;
+		case 1: return (char)196;
+		case 2: return (char)179;
+		case 3: return (char)217;
+		case 4: return (char)196;
+		case 5: return (char)196;
+		case 6: return (char)192;
+		case 7: return (char)193;
+		case 8: return (char)179;
+		case 9: return (char)191;
+		case 10: return (char)179;
+		case 11: return (char)180;
+		case 12: return (char)218;
+		case 13: return (char)194;
+		case 14: return (char)195;
+		case 15: return (char)197;
 		default:
 			CAGE_THROW_CRITICAL(Exception, "invalid connected walls code");
 		}
