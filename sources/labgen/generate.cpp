@@ -1,20 +1,11 @@
 #include "labgen.h"
 
-#include <cage-core/math.h>
 #include <cage-core/pointerRangeHolder.h>
 
 #include <initializer_list>
 
 namespace
 {
-	enum class Cell : char
-	{
-		None = 0, // outside of playable map
-		Empty = 1, // walkable
-		Wall = 2,
-		Tmp = 3,
-	};
-
 	struct Generator
 	{
 		std::vector<Cell> cells;
@@ -177,7 +168,6 @@ Labyrinth generate()
 	Labyrinth lab;
 	lab.width = gen.width;
 	lab.height = gen.height;
-	std::vector<char> cells = (std::vector<char> &&)templates::move(gen.cells);
-	lab.cells = PointerRangeHolder<char>(templates::move(cells));
+	lab.cells = PointerRangeHolder<Cell>(templates::move(gen.cells));
 	return lab;
 }

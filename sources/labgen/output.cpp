@@ -6,11 +6,21 @@
 
 namespace
 {
+#ifdef CAGE_DEBUG
+	const string Start = u8"S";
+	const string Goal = u8"G";
+	const string Path = u8"+";
+#else
+	const string Start = u8"\U0001F415"; // dog
+	const string Goal = u8"\U0001F9B4"; // bone
+	const string Path = u8"\U0001F43E"; // paw prints
+#endif // CAGE_DEBUG
+
 	string connectedWall(uint32 neighbors)
 	{
 		switch (neighbors)
 		{
-		case 0: return "+";
+		case 0: return "O";
 		case 1: return u8"\u2500";
 		case 2: return u8"\u2502";
 		case 3: return u8"\u2518";
@@ -31,32 +41,51 @@ namespace
 		}
 	}
 
-	string convertToAscii(const Labyrinth &lab, uint32 y)
+	string convertToAscii(Labyrinth &lab, uint32 y)
 	{
 		string res;
 		for (uint32 x = 1; x < lab.width - 1; x++)
 		{
-			if (lab.cell(x, y) == 2)
+			switch (lab.cell(ivec2(x, y)))
+			{
+			case Cell::None:
+				res += u8" ";
+				break;
+			case Cell::Wall:
 			{
 				uint32 neighbors = 0;
-				if (lab.cell(x - 1, y) == 2)
+				if (lab.cell(ivec2(x - 1, y)) == Cell::Wall)
 					neighbors += 1; // left
-				if (lab.cell(x, y - 1) == 2)
+				if (lab.cell(ivec2(x, y - 1)) == Cell::Wall)
 					neighbors += 2; // top
-				if (lab.cell(x + 1, y) == 2)
+				if (lab.cell(ivec2(x + 1, y)) == Cell::Wall)
 					neighbors += 4; // right
-				if (lab.cell(x, y + 1) == 2)
+				if (lab.cell(ivec2(x, y + 1)) == Cell::Wall)
 					neighbors += 8; // bottom
 				res += connectedWall(neighbors);
-			}
-			else
+			} break;
+			case Cell::Empty:
+				res += u8" ";
+				break;
+			case Cell::Start:
+				res += Start;
+				break;
+			case Cell::Goal:
+				res += Goal;
+				break;
+			case Cell::Path:
+				res += Path;
+				break;
+			default:
 				res += " ";
+				break;
+			}
 		}
 		return res;
 	}
 }
 
-void outputs(const Labyrinth &lab)
+void outputs(Labyrinth &lab)
 {
 	CAGE_LOG(SeverityEnum::Info, "output", "generating outputs");
 
@@ -68,6 +97,7 @@ void outputs(const Labyrinth &lab)
 		string s = convertToAscii(lab, y);
 		p->writeLine(s);
 		CAGE_LOG_CONTINUE(SeverityEnum::Info, "layout", s);
+		s = replace(s, Path, " ");
 		s = trim(s);
 		c->write(s);
 	}
