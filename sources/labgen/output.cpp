@@ -6,15 +6,9 @@
 
 namespace
 {
-#ifdef CAGE_DEBUG
-	const string Start = u8"S";
-	const string Goal = u8"G";
-	const string Path = u8"+";
-#else
 	const string Start = u8"\U0001F415"; // dog
 	const string Goal = u8"\U0001F9B4"; // bone
 	const string Path = u8"\U0001F43E"; // paw prints
-#endif // CAGE_DEBUG
 
 	string connectedWall(uint32 neighbors)
 	{
@@ -48,9 +42,6 @@ namespace
 		{
 			switch (lab.cell(ivec2(x, y)))
 			{
-			case Cell::None:
-				res += u8" ";
-				break;
 			case Cell::Wall:
 			{
 				uint32 neighbors = 0;
@@ -64,17 +55,14 @@ namespace
 					neighbors += 8; // bottom
 				res += connectedWall(neighbors);
 			} break;
-			case Cell::Empty:
-				res += u8" ";
-				break;
 			case Cell::Start:
-				res += Start;
+				res += "S";
 				break;
 			case Cell::Goal:
-				res += Goal;
+				res += "G";
 				break;
 			case Cell::Path:
-				res += Path;
+				res += "+";
 				break;
 			default:
 				res += " ";
@@ -94,12 +82,14 @@ void outputs(Labyrinth &lab)
 
 	for (uint32 y = 1; y < lab.height - 1; y++)
 	{
-		string s = convertToAscii(lab, y);
-		p->writeLine(s);
+		const string s = convertToAscii(lab, y);
 		CAGE_LOG_CONTINUE(SeverityEnum::Info, "layout", s);
-		s = replace(s, Path, " ");
-		s = trim(s);
-		c->write(s);
+		p->writeLine(s);
+		string r = trim(s);
+		r = replace(r, "+", " ");
+		r = replace(r, "S", Start);
+		r = replace(r, "G", Goal);
+		c->write(r);
 	}
 
 	p->close();
