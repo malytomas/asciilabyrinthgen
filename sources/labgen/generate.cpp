@@ -7,11 +7,6 @@
 
 namespace
 {
-	struct Connection
-	{
-		ivec2 a, b;
-	};
-
 	enum class Cell : char
 	{
 		None = 0, // outside of playable map
@@ -28,6 +23,7 @@ namespace
 		void generate()
 		{
 			rooms();
+			corridors();
 		}
 
 		Cell &cell(ivec2 p)
@@ -37,8 +33,6 @@ namespace
 		}
 
 	private:
-		std::vector<Connection> walls;
-
 		uint32 countCells(Cell cell) const
 		{
 			uint32 cnt = 0;
@@ -88,8 +82,18 @@ namespace
 			}
 		}
 
+		bool isConnected()
+		{
+			seedReplace(findAny(Cell::Empty), Cell::Empty, Cell::Tmp);
+			bool res = countCells(Cell::Empty) == 0;
+			rectReplace(ivec2(), ivec2(width, height), Cell::Tmp, Cell::Empty); // restore back
+			return res;
+		}
+
 		void rooms()
 		{
+			CAGE_LOG(SeverityEnum::Info, "generate", "generating rooms");
+
 			while (true)
 			{
 				width = randomRange(60, 70);
@@ -98,9 +102,9 @@ namespace
 				cells.resize(width * height, Cell::None);
 
 				// generate random rectangular rooms
-				while (countCells(Cell::Empty) < width * height / 3)
+				while (countCells(Cell::Empty) < width * height * 3 / 5)
 				{
-					constexpr uint32 S = 15;
+					constexpr uint32 S = 6;
 					ivec2 a = ivec2(randomRange(1u, width - S), randomRange(1u, height - S));
 					ivec2 b = a + randomRange2i(3, S + 1);
 					rectReplace(a, b, Cell::None, Cell::Empty);
@@ -125,20 +129,49 @@ namespace
 				}
 
 				// detect disconnected areas
-				seedReplace(findAny(Cell::Empty), Cell::Empty, Cell::Tmp);
-				if (countCells(Cell::Empty) == 0)
-				{
-					rectReplace(ivec2(), ivec2(width, height), Cell::Tmp, Cell::Empty); // restore back
+				if (isConnected())
 					break;
-				}
 			}
+		}
+
+		void corridors()
+		{
+			CAGE_LOG(SeverityEnum::Info, "generate", "generating corridors");
+
+			for (uint32 round = 0; round < 1000000; round++)
+			{
+				const ivec2 p = ivec2(randomRange(2u, width - 2), randomRange(2u, height - 2));
+				Cell &c = cell(p);
+				if (c != Cell::Empty)
+					continue;
+				bool neighs[8];
+				{
+					bool *n = neighs;
+					for (ivec2 it : { ivec2(-1, 0), ivec2(-1, -1), ivec2(0, -1), ivec2(1, -1), ivec2(1, 0), ivec2(1, 1), ivec2(0, 1), ivec2(-1, 1) })
+						*n++ = cell(p + it) == Cell::Wall;
+				}
+				if (!neighs[0] && !neighs[2] && !neighs[4] && !neighs[6])
+					continue; // no 4-connected neighbor
+				uint32 sum = 0;
+				for (bool b : neighs)
+					sum += b;
+				if (sum > 2)
+					continue;
+				uint32 changes = 0;
+				for (uint32 i = 0; i < 8; i++)
+					changes += neighs[i] != neighs[(i + 1) % 8];
+				if (changes != 2)
+					continue;
+				c = Cell::Wall;
+			}
+
+			CAGE_ASSERT(isConnected());
 		}
 	};
 }
 
 Labyrinth generate()
 {
-	CAGE_LOG(SeverityEnum::Info, "generate", "generating the labyrinth");
 	Generator gen;
 	gen.generate();
 	Labyrinth lab;

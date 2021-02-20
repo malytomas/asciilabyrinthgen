@@ -14,7 +14,7 @@ struct Labyrinth
 };
 
 Labyrinth generate();
-uint32 solve(const Labyrinth &lab);
+void paths(Labyrinth &lab);
 void outputs(const Labyrinth &lab);
 
 

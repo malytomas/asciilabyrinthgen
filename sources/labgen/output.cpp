@@ -58,7 +58,7 @@ namespace
 
 void outputs(const Labyrinth &lab)
 {
-	CAGE_LOG(SeverityEnum::Info, "output", "generating the outputs");
+	CAGE_LOG(SeverityEnum::Info, "output", "generating outputs");
 
 	Holder<File> p = writeFile("plain.txt");
 	Holder<File> c = writeFile("cypher.txt");

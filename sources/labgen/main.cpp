@@ -9,6 +9,7 @@ int main()
 	log->output.bind<logOutputStdOut>();
 
 	Labyrinth lab = generate();
+	paths(lab);
 	outputs(lab);
 
 	return 0;
