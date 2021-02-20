@@ -1,6 +1,7 @@
 #include "labgen.h"
 
 #include <cage-core/files.h>
+#include <cage-core/string.h>
 #include <cage-core/pointerRangeHolder.h>
 
 namespace
@@ -9,16 +10,15 @@ namespace
 	{
 		switch (neighbors)
 		{
-		case 0:
-		case 1:
-		case 2:
-		case 4:
-		case 8:
-			return ' '; // unconnected wall can be removed
+		case 0: return '+';
+		case 1: return 196;
+		case 2: return 179;
 		case 3: return 217;
+		case 4: return 196;
 		case 5: return 196;
 		case 6: return 192;
 		case 7: return 193;
+		case 8: return 179;
 		case 9: return 191;
 		case 10: return 179;
 		case 11: return 180;
@@ -58,13 +58,21 @@ namespace
 
 void outputs(const Labyrinth &lab)
 {
-	Holder<File> f = writeFile("layout.txt");
+	CAGE_LOG(SeverityEnum::Info, "output", "generating the outputs");
 
-	for (uint32 y = 0; y < lab.height; y++)
+	Holder<File> p = writeFile("plain.txt");
+	Holder<File> c = writeFile("cypher.txt");
+
+	for (uint32 y = 1; y < lab.height - 1; y++)
 	{
 		string s = convertToAscii(lab, y);
-		f->writeLine(s);
+		p->writeLine(s);
+		CAGE_LOG_CONTINUE(SeverityEnum::Info, "layout", s);
+		s = trim(s);
+		c->write(s);
 	}
 
-	f->close();
+	p->close();
+	c->writeLine("");
+	c->close();
 }

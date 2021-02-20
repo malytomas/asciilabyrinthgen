@@ -26,7 +26,6 @@ namespace
 		{
 			init();
 			rooms();
-			filling();
 		}
 
 		Cell &cell(uint32 x, uint32 y)
@@ -39,34 +38,61 @@ namespace
 
 		void init()
 		{
-			width = randomRange(20, 40);
-			height = randomRange(20, 40);
+			width = randomRange(60, 70);
+			height = randomRange(30, 40);
 			cells.resize(width * height, Cell::None);
 		}
 
-		void rooms()
+		uint32 countCells(Cell cell) const
 		{
-			// todo
-			// temporary random char generator
-			for (uint32 y = 1; y < height - 1; y++)
+			uint32 cnt = 0;
+			for (Cell c : cells)
+				if (c == cell)
+					cnt++;
+			return cnt;
+		}
+
+		void replace(uint32 x1, uint32 y1, uint32 x2, uint32 y2, Cell what, Cell with)
+		{
+			for (uint32 y = y1; y < y2; y++)
 			{
-				for (uint32 x = 1; x < width - 1; x++)
+				for (uint32 x = x1; x < x2; x++)
 				{
-					if (randomChance() < 0.3)
-						cell(x, y) = Cell::Wall;
+					Cell &c = cell(x, y);
+					if (c == what)
+						c = with;
 				}
 			}
 		}
 
-		void filling()
+		void room(uint32 x1, uint32 y1, uint32 x2, uint32 y2)
 		{
-			// todo
+			CAGE_ASSERT(x1 > 0);
+			CAGE_ASSERT(y1 > 0);
+			CAGE_ASSERT(x2 > x1);
+			CAGE_ASSERT(y2 > y1);
+			CAGE_ASSERT(x2 < width);
+			CAGE_ASSERT(y2 < height);
+			replace(x1, y1, x2, y2, Cell::None, Cell::Wall);
+			replace(x1 + 1, y1 + 1, x2 - 1, y2 - 1, Cell::Wall, Cell::Empty);
+		}
+
+		void rooms()
+		{
+			while (countCells(Cell::Empty) < width * height / 3)
+			{
+				constexpr uint32 S = 15;
+				uint32 a = randomRange(1u, width - S);
+				uint32 b = randomRange(1u, height - S);
+				room(a, b, a + randomRange(3u, S + 1), b + randomRange(3u, S + 1));
+			}
 		}
 	};
 }
 
 Labyrinth generate()
 {
+	CAGE_LOG(SeverityEnum::Info, "generate", "generating the labyrinth");
 	Generator gen;
 	gen.generate();
 	Labyrinth lab;
