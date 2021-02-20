@@ -6,26 +6,26 @@
 
 namespace
 {
-	char connectedWall(uint32 neighbors)
+	string connectedWall(uint32 neighbors)
 	{
 		switch (neighbors)
 		{
-		case 0: return '+';
-		case 1: return (char)196;
-		case 2: return (char)179;
-		case 3: return (char)217;
-		case 4: return (char)196;
-		case 5: return (char)196;
-		case 6: return (char)192;
-		case 7: return (char)193;
-		case 8: return (char)179;
-		case 9: return (char)191;
-		case 10: return (char)179;
-		case 11: return (char)180;
-		case 12: return (char)218;
-		case 13: return (char)194;
-		case 14: return (char)195;
-		case 15: return (char)197;
+		case 0: return "+";
+		case 1: return u8"\u2500";
+		case 2: return u8"\u2502";
+		case 3: return u8"\u2518";
+		case 4: return u8"\u2500";
+		case 5: return u8"\u2500";
+		case 6: return u8"\u2514";
+		case 7: return u8"\u2534";
+		case 8: return u8"\u2502";
+		case 9: return u8"\u2510";
+		case 10: return u8"\u2502";
+		case 11: return u8"\u2524";
+		case 12: return u8"\u250C";
+		case 13: return u8"\u252C";
+		case 14: return u8"\u251C";
+		case 15: return u8"\u253C";
 		default:
 			CAGE_THROW_CRITICAL(Exception, "invalid connected walls code");
 		}
@@ -47,7 +47,7 @@ namespace
 					neighbors += 4; // right
 				if (lab.cell(x, y + 1) == 2)
 					neighbors += 8; // bottom
-				res += string(connectedWall(neighbors));
+				res += connectedWall(neighbors);
 			}
 			else
 				res += " ";
