@@ -1,6 +1,6 @@
-#include <cage-core/logger.h>
+#include "labgen.h"
 
-using namespace cage;
+#include <cage-core/logger.h>
 
 int main()
 {
@@ -8,7 +8,8 @@ int main()
 	log->format.bind<logFormatConsole>();
 	log->output.bind<logOutputStdOut>();
 
-	// todo
+	Labyrinth lab = generate();
+	outputs(lab);
 
 	return 0;
 }
