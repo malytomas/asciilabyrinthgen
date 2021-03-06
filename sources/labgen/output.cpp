@@ -9,6 +9,7 @@ namespace
 	const string Start = u8"\U0001F415"; // dog
 	const string Goal = u8"\U0001F9B4"; // bone
 	const string Path = u8"\U0001F43E"; // paw prints
+	const string Empty = u8"\u00B7"; // middle dot
 
 	string connectedWall(uint32 neighbors)
 	{
@@ -64,6 +65,9 @@ namespace
 			case Cell::Path:
 				res += "+";
 				break;
+			case Cell::Empty:
+				res += Empty;
+				break;
 			default:
 				res += " ";
 				break;
@@ -86,7 +90,7 @@ void outputs(Labyrinth &lab)
 		CAGE_LOG_CONTINUE(SeverityEnum::Info, "layout", s);
 		p->writeLine(s);
 		string r = trim(s);
-		r = replace(r, "+", " ");
+		r = replace(r, "+", Empty);
 		r = replace(r, "S", Start);
 		r = replace(r, "G", Goal);
 		c->write(r);
